@@ -1,7 +1,7 @@
-import { db } from "@/config/db";
+import { db } from "../../config/db";
 import { complianceItems, cases, complianceSections } from "@/db/schema.js";
 import { eq, and } from "drizzle-orm";
-import { logActivity } from "@/utils/logActivity";
+import { logActivity } from "../../utils/logActivity";
 
 /* =========================
    Add Compliance Item

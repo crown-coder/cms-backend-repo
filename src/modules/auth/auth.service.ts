@@ -1,4 +1,4 @@
-import { db } from "@/config/db";
+import { db } from "../../config/db";
 import { users, enforcementHeadStates } from "@/db/schema.js";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
