@@ -1,5 +1,5 @@
 import { db } from "../../config/db";
-import { users, enforcementHeadStates } from "@/db/schema.js";
+import { users, enforcementHeadStates } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
