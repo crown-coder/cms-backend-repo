@@ -4,7 +4,7 @@ import {
   complianceSections,
   complianceItems,
   enforcementHeadStates,
-} from "../../db/schema";
+} from "../../db/schema.js";
 import { eq, inArray } from "drizzle-orm";
 import { logActivity } from "../../utils/logActivity";
 

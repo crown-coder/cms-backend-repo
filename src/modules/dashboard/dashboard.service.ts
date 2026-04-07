@@ -1,5 +1,4 @@
 import { db } from "../../config/db";
-import { cases } from "../../db/schema";
 import { sql } from "drizzle-orm";
 
 /* =========================
