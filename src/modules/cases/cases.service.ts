@@ -1,10 +1,10 @@
-import { db } from "../../config/db";
+import { db } from "@/config/db";
 import {
   cases,
   complianceSections,
   complianceItems,
   enforcementHeadStates,
-} from "../../db/schema.js";
+} from "@/db/schema.js";
 import { eq, inArray } from "drizzle-orm";
 import { logActivity } from "../../utils/logActivity";
 
