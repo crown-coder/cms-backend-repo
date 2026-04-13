@@ -11,7 +11,7 @@ const app = express();
 app.use(
   cors({
     // origin: "http://localhost:5173", // frontend
-    origin: "https://compliance-management-system-update.netlify.app", // frontend production
+    origin: "https://compliance.apps.cac.gov.ng", // frontend production
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   }),
