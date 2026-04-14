@@ -21,11 +21,26 @@ export const getAll = async (req: any, res: Response) => {
 
 export const resolve = async (req: any, res: Response) => {
   try {
+    const {
+      resolutionType,
+      remark,
+      penaltyReduction,
+      suspendedUntil,
+      suspensionReason,
+    } = req.body;
+
     const result = await caseService.resolveCase(
       Number(req.params.id),
       req.user,
-      req.body.remark,
+      {
+        resolutionType,
+        remark,
+        penaltyReduction,
+        suspendedUntil,
+        suspensionReason,
+      },
     );
+
     res.json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message });

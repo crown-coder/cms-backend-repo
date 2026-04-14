@@ -15,6 +15,13 @@
       "when": 1773054584586,
       "tag": "0001_rainy_madelyne_pryor",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776157204679,
+      "tag": "0002_regular_dragon_lord",
+      "breakpoints": true
     }
   ]
 }

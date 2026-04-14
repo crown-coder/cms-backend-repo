@@ -25,6 +25,13 @@ export const caseStatusEnum = pgEnum("case_status", [
   "in_progress",
   "escalated",
   "resolved",
+  "suspended",
+]);
+
+export const caseResolutionTypeEnum = pgEnum("case_resolution_type", [
+  "payment_complete",
+  "penalty_waived",
+  "suspended",
 ]);
 
 export const complianceStatusEnum = pgEnum("compliance_status", [
@@ -129,6 +136,10 @@ export const cases = pgTable("cases", {
   state: stateEnum("state").notNull(),
 
   status: caseStatusEnum("status").default("pending"),
+  resolutionType: caseResolutionTypeEnum("resolution_type"),
+  penaltyReduction: numeric("penalty_reduction").default("0"),
+  suspensionReason: text("suspension_reason"),
+  suspendedUntil: timestamp("suspended_until"),
 
   totalPenalty: numeric("total_penalty").default("0"),
   totalPaid: numeric("total_paid").default("0"),
