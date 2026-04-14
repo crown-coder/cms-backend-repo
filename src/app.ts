@@ -5,6 +5,7 @@ import caseRoutes from "./modules/cases/cases.routes";
 import complianceRoutes from "./modules/compliance/compliance.routes";
 import complianceSectionsRoutes from "./modules/compliance-sections/complianceSections.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
+import paymentRoutes from "./modules/payments/payments.routes";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/cases", caseRoutes);
 app.use("/api/compliance", complianceRoutes);
 app.use("/api/compliance-sections", complianceSectionsRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.send("CMS Backend Running 🚀");

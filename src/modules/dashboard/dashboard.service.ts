@@ -28,7 +28,8 @@ export const getSummary = async (user: any) => {
       COUNT(*) FILTER (WHERE status = 'pending') AS pending_cases,
       COUNT(*) FILTER (WHERE status = 'resolved') AS resolved_cases,
       COALESCE(SUM(total_penalty), 0) AS total_penalty,
-      COALESCE(SUM(total_paid), 0) AS total_paid
+      COALESCE(SUM(total_paid), 0) AS total_paid,
+      COALESCE(SUM(penalty_reduction), 0) AS total_waived
     FROM cases
     ${whereClause}
   `);
@@ -58,6 +59,7 @@ export const getSummary = async (user: any) => {
     resolvedCases: Number(summary.resolved_cases),
     totalPenalty: summary.total_penalty,
     totalPaid: summary.total_paid,
+    totalWaived: summary.total_waived,
     outstandingBalance:
       Number(summary.total_penalty) - Number(summary.total_paid),
     casesByState: byState,
