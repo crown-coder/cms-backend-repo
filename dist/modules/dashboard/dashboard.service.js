@@ -53,7 +53,8 @@ const getSummary = async (user) => {
         totalPenalty: summary.total_penalty,
         totalPaid: summary.total_paid,
         totalWaived: summary.total_waived,
-        outstandingBalance: Number(summary.total_penalty) - Number(summary.total_paid),
+        outstandingBalance: Number(summary.total_penalty) -
+            (Number(summary.total_paid) + Number(summary.total_waived)),
         casesByState: byState,
     };
 };
