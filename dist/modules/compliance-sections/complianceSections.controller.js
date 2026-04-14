@@ -33,10 +33,20 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAll = void 0;
+exports.create = exports.getAll = void 0;
 const service = __importStar(require("./complianceSections.service"));
 const getAll = async (_req, res) => {
     const sections = await service.getSections();
     res.json(sections);
 };
 exports.getAll = getAll;
+const create = async (req, res) => {
+    try {
+        const result = await service.createSection(req.user, req.body);
+        res.json(result);
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+exports.create = create;
