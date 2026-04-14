@@ -163,3 +163,39 @@ export const deleteUser = async (currentUser: any, userId: number) => {
 
   return { message: "User deleted successfully" };
 };
+
+export const updateUserPassword = async (
+  currentUser: any,
+  currentPassword: string,
+  newPassword: string,
+) => {
+  if (!currentPassword || !newPassword) {
+    throw new Error("Current password and new password are required");
+  }
+
+  if (currentPassword === newPassword) {
+    throw new Error("New password must be different from current password");
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, currentUser.id),
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!isMatch) {
+    throw new Error("Current password is incorrect");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await db
+    .update(users)
+    .set({ passwordHash: hashedPassword })
+    .where(eq(users.id, user.id));
+
+  return { message: "Password updated successfully" };
+};

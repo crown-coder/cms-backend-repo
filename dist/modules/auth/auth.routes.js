@@ -7,6 +7,7 @@ const router = (0, express_1.Router)();
 router.post("/login", auth_controller_1.login);
 // Protected route
 router.post("/create-user", auth_middleware_1.authenticate, auth_controller_1.registerUser);
+router.post("/update-password", auth_middleware_1.authenticate, auth_controller_1.updatePassword);
 router.get("/users", auth_middleware_1.authenticate, auth_controller_1.fetchUsers);
 router.delete("/users/:id", auth_middleware_1.authenticate, auth_controller_1.removeUser);
 router.post("/bootstrap-super-admin", auth_controller_1.createSuperAdmin);

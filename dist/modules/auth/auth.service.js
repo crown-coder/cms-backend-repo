@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.bootstrapSuperAdmin = exports.getAllUsers = exports.createUser = exports.loginUser = void 0;
+exports.updateUserPassword = exports.deleteUser = exports.bootstrapSuperAdmin = exports.getAllUsers = exports.createUser = exports.loginUser = void 0;
 const db_1 = require("../../config/db");
 const schema_1 = require("../../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");
@@ -136,3 +136,28 @@ const deleteUser = async (currentUser, userId) => {
     return { message: "User deleted successfully" };
 };
 exports.deleteUser = deleteUser;
+const updateUserPassword = async (currentUser, currentPassword, newPassword) => {
+    if (!currentPassword || !newPassword) {
+        throw new Error("Current password and new password are required");
+    }
+    if (currentPassword === newPassword) {
+        throw new Error("New password must be different from current password");
+    }
+    const user = await db_1.db.query.users.findFirst({
+        where: (0, drizzle_orm_1.eq)(schema_1.users.id, currentUser.id),
+    });
+    if (!user) {
+        throw new Error("User not found");
+    }
+    const isMatch = await bcrypt_1.default.compare(currentPassword, user.passwordHash);
+    if (!isMatch) {
+        throw new Error("Current password is incorrect");
+    }
+    const hashedPassword = await bcrypt_1.default.hash(newPassword, 10);
+    await db_1.db
+        .update(schema_1.users)
+        .set({ passwordHash: hashedPassword })
+        .where((0, drizzle_orm_1.eq)(schema_1.users.id, user.id));
+    return { message: "Password updated successfully" };
+};
+exports.updateUserPassword = updateUserPassword;

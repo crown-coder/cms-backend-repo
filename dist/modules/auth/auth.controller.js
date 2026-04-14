@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeUser = exports.createSuperAdmin = exports.fetchUsers = exports.registerUser = exports.login = void 0;
+exports.updatePassword = exports.removeUser = exports.createSuperAdmin = exports.fetchUsers = exports.registerUser = exports.login = void 0;
 const auth_service_1 = require("./auth.service");
 const login = async (req, res) => {
     try {
@@ -53,3 +53,14 @@ const removeUser = async (req, res) => {
     }
 };
 exports.removeUser = removeUser;
+const updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const result = await (0, auth_service_1.updateUserPassword)(req.user, currentPassword, newPassword);
+        res.json(result);
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+exports.updatePassword = updatePassword;

@@ -5,6 +5,7 @@ import {
   getAllUsers,
   bootstrapSuperAdmin,
   deleteUser,
+  updateUserPassword,
 } from "./auth.service";
 
 export const login = async (req: Request, res: Response) => {
@@ -54,5 +55,21 @@ export const removeUser = async (req: any, res: Response) => {
     res.json(result);
   } catch (error: any) {
     res.status(403).json({ message: error.message });
+  }
+};
+
+export const updatePassword = async (req: any, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const result = await updateUserPassword(
+      req.user,
+      currentPassword,
+      newPassword,
+    );
+
+    res.json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
   }
 };
