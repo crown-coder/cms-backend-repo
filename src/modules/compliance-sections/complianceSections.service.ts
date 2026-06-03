@@ -1,5 +1,5 @@
 import { db } from "../../config/db";
-import { complianceSections } from "../../db/schema.js";
+import { complianceSections } from "../../db/schema";
 import { eq } from "drizzle-orm";
 
 export const getSections = async () => {

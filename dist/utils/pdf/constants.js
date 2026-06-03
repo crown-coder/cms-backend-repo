@@ -1,0 +1,61 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FONT_SIZES = exports.FONTS = exports.COLORS = exports.PAGE = void 0;
+exports.PAGE = {
+    WIDTH: 595.28,
+    HEIGHT: 841.89,
+    MARGIN: 50,
+    CONTENT_WIDTH: 495,
+    FOOTER_MARGIN: 75,
+    HEADER_HEIGHT: 90,
+    MIN_SECTION_SPACE: 150,
+};
+exports.COLORS = {
+    primary: "#166534",
+    primaryDark: "#14532D",
+    primaryLight: "#22C55E",
+    primaryPale: "#DCFCE7",
+    dark: "#1F2937",
+    gray: "#6B7280",
+    grayLight: "#9CA3AF",
+    lightGray: "#F3F4F6",
+    lighterGray: "#F9FAFB",
+    white: "#FFFFFF",
+    accent: "#F0FDF4",
+    accentBlue: "#EFF6FF",
+    accentRed: "#FEF2F2",
+    accentOrange: "#FFF7ED",
+    accentPurple: "#F5F3FF",
+    border: "#D1D5DB",
+    borderLight: "#E5E7EB",
+    tableHeader: "#166534",
+    tableHeaderText: "#FFFFFF",
+    tableStripe: "#F9FAFB",
+    tableBorder: "#E5E7EB",
+    success: "#166534",
+    successLight: "#DCFCE7",
+    danger: "#DC2626",
+    dangerLight: "#FEE2E2",
+    warning: "#EA580C",
+    warningLight: "#FFEDD5",
+    info: "#2563EB",
+    infoLight: "#DBEAFE",
+    purple: "#7C3AED",
+    purpleLight: "#EDE9FE",
+};
+exports.FONTS = {
+    regular: "Helvetica",
+    bold: "Helvetica-Bold",
+    oblique: "Helvetica-Oblique",
+    boldOblique: "Helvetica-BoldOblique",
+};
+exports.FONT_SIZES = {
+    title: 20,
+    heading: 14,
+    subheading: 12,
+    body: 10,
+    small: 9,
+    caption: 8,
+    tiny: 7,
+    micro: 6,
+};

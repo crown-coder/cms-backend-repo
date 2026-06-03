@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.activityLogs = exports.complianceSections = exports.payments = exports.complianceItems = exports.cases = exports.enforcementHeadStates = exports.users = exports.stateEnum = exports.complianceStatusEnum = exports.caseResolutionTypeEnum = exports.caseStatusEnum = exports.roleEnum = void 0;
+exports.activityLogs = exports.complianceSections = exports.payments = exports.complianceItems = exports.cases = exports.enforcementHeadStates = exports.userRecoveryCodes = exports.users = exports.stateEnum = exports.complianceStatusEnum = exports.caseResolutionTypeEnum = exports.caseStatusEnum = exports.roleEnum = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 /* =========================
    ENUMS
@@ -75,9 +75,26 @@ exports.users = (0, pg_core_1.pgTable)("users", {
     email: (0, pg_core_1.text)("email").notNull().unique(),
     passwordHash: (0, pg_core_1.text)("password_hash").notNull(),
     isActive: (0, pg_core_1.boolean)("is_active").default(true),
+    twoFactorEnabled: (0, pg_core_1.boolean)("two_factor_enabled").default(false),
+    twoFactorSecret: (0, pg_core_1.text)("two_factor_secret"),
+    twoFactorTempSecret: (0, pg_core_1.text)("two_factor_temp_secret"),
+    twoFactorTempIssuedAt: (0, pg_core_1.timestamp)("two_factor_temp_issued_at"),
+    twoFactorLastUsedStep: (0, pg_core_1.integer)("two_factor_last_used_step"),
     role: (0, exports.roleEnum)("role").notNull(),
     // used by state_controller & officer
     state: (0, exports.stateEnum)("state"),
+    createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow(),
+});
+/* =========================
+   USER RECOVERY CODES
+========================= */
+exports.userRecoveryCodes = (0, pg_core_1.pgTable)("user_recovery_codes", {
+    id: (0, pg_core_1.serial)("id").primaryKey(),
+    userId: (0, pg_core_1.integer)("user_id")
+        .references(() => exports.users.id)
+        .notNull(),
+    codeHash: (0, pg_core_1.text)("code_hash").notNull(),
+    usedAt: (0, pg_core_1.timestamp)("used_at"),
     createdAt: (0, pg_core_1.timestamp)("created_at").defaultNow(),
 });
 /* =========================

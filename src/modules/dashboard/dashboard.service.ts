@@ -1,5 +1,7 @@
 import { db } from "../../config/db";
 import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { enforcementHeadStates } from "../../db/schema";
 
 /* =========================
    Dashboard Summary (Role Aware)
@@ -53,6 +55,22 @@ export const getSummary = async (user: any) => {
 
   const summary = totals.rows[0];
 
+  /* -------------------------
+     Get Assigned States
+  ------------------------- */
+  let assignedStates: string[] = [];
+
+  if (user.role === "enforcement_head") {
+    const states = await db
+      .select({ state: enforcementHeadStates.state })
+      .from(enforcementHeadStates)
+      .where(eq(enforcementHeadStates.enforcementHeadId, user.id));
+
+    assignedStates = states.map((s) => s.state);
+  } else if (user.state) {
+    assignedStates = [user.state];
+  }
+
   return {
     totalCases: Number(summary.total_cases),
     pendingCases: Number(summary.pending_cases),
@@ -64,5 +82,6 @@ export const getSummary = async (user: any) => {
       Number(summary.total_penalty) -
       (Number(summary.total_paid) + Number(summary.total_waived)),
     casesByState: byState,
+    assignedStates,
   };
 };

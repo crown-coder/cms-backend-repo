@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSummary = void 0;
 const db_1 = require("../../config/db");
 const drizzle_orm_1 = require("drizzle-orm");
+const drizzle_orm_2 = require("drizzle-orm");
+const schema_1 = require("../../db/schema");
 /* =========================
    Dashboard Summary (Role Aware)
 ========================= */
@@ -46,6 +48,20 @@ const getSummary = async (user) => {
         byState = result.rows;
     }
     const summary = totals.rows[0];
+    /* -------------------------
+       Get Assigned States
+    ------------------------- */
+    let assignedStates = [];
+    if (user.role === "enforcement_head") {
+        const states = await db_1.db
+            .select({ state: schema_1.enforcementHeadStates.state })
+            .from(schema_1.enforcementHeadStates)
+            .where((0, drizzle_orm_2.eq)(schema_1.enforcementHeadStates.enforcementHeadId, user.id));
+        assignedStates = states.map((s) => s.state);
+    }
+    else if (user.state) {
+        assignedStates = [user.state];
+    }
     return {
         totalCases: Number(summary.total_cases),
         pendingCases: Number(summary.pending_cases),
@@ -56,6 +72,7 @@ const getSummary = async (user) => {
         outstandingBalance: Number(summary.total_penalty) -
             (Number(summary.total_paid) + Number(summary.total_waived)),
         casesByState: byState,
+        assignedStates,
     };
 };
 exports.getSummary = getSummary;

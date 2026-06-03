@@ -92,10 +92,33 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   isActive: boolean("is_active").default(true),
 
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorTempSecret: text("two_factor_temp_secret"),
+  twoFactorTempIssuedAt: timestamp("two_factor_temp_issued_at"),
+  twoFactorLastUsedStep: integer("two_factor_last_used_step"),
+
   role: roleEnum("role").notNull(),
 
   // used by state_controller & officer
   state: stateEnum("state"),
+
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+/* =========================
+   USER RECOVERY CODES
+========================= */
+
+export const userRecoveryCodes = pgTable("user_recovery_codes", {
+  id: serial("id").primaryKey(),
+
+  userId: integer("user_id")
+    .references(() => users.id)
+    .notNull(),
+
+  codeHash: text("code_hash").notNull(),
+  usedAt: timestamp("used_at"),
 
   createdAt: timestamp("created_at").defaultNow(),
 });

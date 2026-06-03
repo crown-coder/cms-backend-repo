@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCaseById = exports.resolveCase = exports.getCases = exports.createCase = void 0;
 const db_1 = require("../../config/db");
-const schema_js_1 = require("../../db/schema.js");
+const schema_1 = require("../../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");
 const logActivity_1 = require("../../utils/logActivity");
 const createCase = async (user, data) => {
     const newCase = await db_1.db
-        .insert(schema_js_1.cases)
+        .insert(schema_1.cases)
         .values({
         companyName: data.companyName,
         rcNumber: data.rcNumber,
@@ -28,21 +28,21 @@ const createCase = async (user, data) => {
 exports.createCase = createCase;
 const getCases = async (user) => {
     if (user.role === "super_admin") {
-        return await db_1.db.select().from(schema_js_1.cases);
+        return await db_1.db.select().from(schema_1.cases);
     }
     if (user.role === "enforcement_head") {
         const states = await db_1.db
             .select()
-            .from(schema_js_1.enforcementHeadStates)
-            .where((0, drizzle_orm_1.eq)(schema_js_1.enforcementHeadStates.enforcementHeadId, user.id));
+            .from(schema_1.enforcementHeadStates)
+            .where((0, drizzle_orm_1.eq)(schema_1.enforcementHeadStates.enforcementHeadId, user.id));
         const stateList = states.map((s) => s.state);
-        return await db_1.db.select().from(schema_js_1.cases).where((0, drizzle_orm_1.inArray)(schema_js_1.cases.state, stateList));
+        return await db_1.db.select().from(schema_1.cases).where((0, drizzle_orm_1.inArray)(schema_1.cases.state, stateList));
     }
     if (user.role === "state_controller" || user.role === "officer") {
         if (!user.state) {
             throw new Error("User is not assigned to a state");
         }
-        return await db_1.db.select().from(schema_js_1.cases).where((0, drizzle_orm_1.eq)(schema_js_1.cases.state, user.state));
+        return await db_1.db.select().from(schema_1.cases).where((0, drizzle_orm_1.eq)(schema_1.cases.state, user.state));
     }
     throw new Error("Unauthorized");
 };
@@ -53,8 +53,8 @@ const resolveCase = async (caseId, user, data) => {
     }
     const caseRows = await db_1.db
         .select()
-        .from(schema_js_1.cases)
-        .where((0, drizzle_orm_1.eq)(schema_js_1.cases.id, caseId))
+        .from(schema_1.cases)
+        .where((0, drizzle_orm_1.eq)(schema_1.cases.id, caseId))
         .limit(1);
     if (!caseRows.length) {
         throw new Error("Case not found");
@@ -102,9 +102,9 @@ const resolveCase = async (caseId, user, data) => {
             : null;
     }
     const updated = await db_1.db
-        .update(schema_js_1.cases)
+        .update(schema_1.cases)
         .set(updates)
-        .where((0, drizzle_orm_1.eq)(schema_js_1.cases.id, caseId))
+        .where((0, drizzle_orm_1.eq)(schema_1.cases.id, caseId))
         .returning();
     if (!updated.length) {
         throw new Error("Case update failed");
@@ -124,8 +124,8 @@ exports.resolveCase = resolveCase;
 const getCaseById = async (user, caseId) => {
     const caseData = await db_1.db
         .select()
-        .from(schema_js_1.cases)
-        .where((0, drizzle_orm_1.eq)(schema_js_1.cases.id, caseId))
+        .from(schema_1.cases)
+        .where((0, drizzle_orm_1.eq)(schema_1.cases.id, caseId))
         .limit(1);
     if (!caseData.length) {
         throw new Error("Case not found");
@@ -139,8 +139,8 @@ const getCaseById = async (user, caseId) => {
     if (user.role === "enforcement_head") {
         const states = await db_1.db
             .select()
-            .from(schema_js_1.enforcementHeadStates)
-            .where((0, drizzle_orm_1.eq)(schema_js_1.enforcementHeadStates.enforcementHeadId, user.id));
+            .from(schema_1.enforcementHeadStates)
+            .where((0, drizzle_orm_1.eq)(schema_1.enforcementHeadStates.enforcementHeadId, user.id));
         const stateList = states.map((s) => s.state);
         if (!stateList.includes(singleCase.state)) {
             throw new Error("Unauthorized to view this case");
@@ -148,21 +148,21 @@ const getCaseById = async (user, caseId) => {
     }
     const items = await db_1.db
         .select({
-        id: schema_js_1.complianceItems.id,
-        sectionId: schema_js_1.complianceItems.sectionId,
-        sectionCode: schema_js_1.complianceSections.code,
-        sectionTitle: schema_js_1.complianceSections.title,
-        complianceStatus: schema_js_1.complianceItems.complianceStatus,
-        periodOfNonCompliance: schema_js_1.complianceItems.periodOfNonCompliance,
-        officersPenalised: schema_js_1.complianceItems.officersPenalised,
-        penaltyComputation: schema_js_1.complianceItems.penaltyComputation,
-        totalPayable: schema_js_1.complianceItems.totalPayable,
-        amountPaid: schema_js_1.complianceItems.amountPaid,
-        notes: schema_js_1.complianceItems.notes,
+        id: schema_1.complianceItems.id,
+        sectionId: schema_1.complianceItems.sectionId,
+        sectionCode: schema_1.complianceSections.code,
+        sectionTitle: schema_1.complianceSections.title,
+        complianceStatus: schema_1.complianceItems.complianceStatus,
+        periodOfNonCompliance: schema_1.complianceItems.periodOfNonCompliance,
+        officersPenalised: schema_1.complianceItems.officersPenalised,
+        penaltyComputation: schema_1.complianceItems.penaltyComputation,
+        totalPayable: schema_1.complianceItems.totalPayable,
+        amountPaid: schema_1.complianceItems.amountPaid,
+        notes: schema_1.complianceItems.notes,
     })
-        .from(schema_js_1.complianceItems)
-        .leftJoin(schema_js_1.complianceSections, (0, drizzle_orm_1.eq)(schema_js_1.complianceItems.sectionId, schema_js_1.complianceSections.id))
-        .where((0, drizzle_orm_1.eq)(schema_js_1.complianceItems.caseId, caseId));
+        .from(schema_1.complianceItems)
+        .leftJoin(schema_1.complianceSections, (0, drizzle_orm_1.eq)(schema_1.complianceItems.sectionId, schema_1.complianceSections.id))
+        .where((0, drizzle_orm_1.eq)(schema_1.complianceItems.caseId, caseId));
     return {
         ...singleCase,
         complianceItems: items,

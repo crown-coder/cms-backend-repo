@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addComplianceItem = void 0;
 const db_1 = require("../../config/db");
-const schema_js_1 = require("../../db/schema.js");
+const schema_1 = require("../../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");
 const logActivity_1 = require("../../utils/logActivity");
 /* =========================
@@ -14,8 +14,8 @@ const addComplianceItem = async (user, caseId, data) => {
     ------------------------- */
     const section = await db_1.db
         .select()
-        .from(schema_js_1.complianceSections)
-        .where((0, drizzle_orm_1.eq)(schema_js_1.complianceSections.id, data.sectionId))
+        .from(schema_1.complianceSections)
+        .where((0, drizzle_orm_1.eq)(schema_1.complianceSections.id, data.sectionId))
         .limit(1);
     if (!section.length) {
         throw new Error("Invalid compliance section");
@@ -25,8 +25,8 @@ const addComplianceItem = async (user, caseId, data) => {
     ------------------------- */
     const existing = await db_1.db
         .select()
-        .from(schema_js_1.complianceItems)
-        .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_js_1.complianceItems.caseId, caseId), (0, drizzle_orm_1.eq)(schema_js_1.complianceItems.sectionId, data.sectionId)))
+        .from(schema_1.complianceItems)
+        .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.complianceItems.caseId, caseId), (0, drizzle_orm_1.eq)(schema_1.complianceItems.sectionId, data.sectionId)))
         .limit(1);
     if (existing.length) {
         throw new Error("This section already exists for this case");
@@ -35,7 +35,7 @@ const addComplianceItem = async (user, caseId, data) => {
        3️⃣ Insert compliance item
     ------------------------- */
     const newItem = await db_1.db
-        .insert(schema_js_1.complianceItems)
+        .insert(schema_1.complianceItems)
         .values({
         caseId,
         sectionId: data.sectionId,
@@ -72,8 +72,8 @@ exports.addComplianceItem = addComplianceItem;
 const recalculateCaseTotals = async (caseId) => {
     const items = await db_1.db
         .select()
-        .from(schema_js_1.complianceItems)
-        .where((0, drizzle_orm_1.eq)(schema_js_1.complianceItems.caseId, caseId));
+        .from(schema_1.complianceItems)
+        .where((0, drizzle_orm_1.eq)(schema_1.complianceItems.caseId, caseId));
     let totalPenalty = 0;
     let totalPaid = 0;
     for (const item of items) {
@@ -81,10 +81,10 @@ const recalculateCaseTotals = async (caseId) => {
         totalPaid += Number(item.amountPaid ?? 0);
     }
     await db_1.db
-        .update(schema_js_1.cases)
+        .update(schema_1.cases)
         .set({
         totalPenalty: totalPenalty.toString(),
         totalPaid: totalPaid.toString(),
     })
-        .where((0, drizzle_orm_1.eq)(schema_js_1.cases.id, caseId));
+        .where((0, drizzle_orm_1.eq)(schema_1.cases.id, caseId));
 };

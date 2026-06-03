@@ -6,6 +6,7 @@ import {
   bootstrapSuperAdmin,
   deleteUser,
   updateUserPassword,
+  getUserById,
 } from "./auth.service";
 
 export const login = async (req: Request, res: Response) => {
@@ -34,6 +35,15 @@ export const fetchUsers = async (req: any, res: Response) => {
   try {
     const users = await getAllUsers(req.user);
     res.json(users);
+  } catch (error: any) {
+    res.status(403).json({ message: error.message });
+  }
+};
+
+export const fetchUserById = async (req: any, res: Response) => {
+  try {
+    const user = await getUserById(req.user, Number(req.params.id));
+    res.json(user);
   } catch (error: any) {
     res.status(403).json({ message: error.message });
   }

@@ -3,6 +3,7 @@ import {
   login,
   registerUser,
   fetchUsers,
+  fetchUserById,
   createSuperAdmin,
   removeUser,
   updatePassword,
@@ -17,6 +18,7 @@ router.post("/login", login);
 router.post("/create-user", authenticate, registerUser);
 router.post("/update-password", authenticate, updatePassword);
 router.get("/users", authenticate, fetchUsers);
+router.get("/users/:id", authenticate, fetchUserById);
 router.delete("/users/:id", authenticate, removeUser);
 
 router.post("/bootstrap-super-admin", createSuperAdmin);

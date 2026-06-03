@@ -3,6 +3,8 @@ import { users, enforcementHeadStates } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { createTwoFactorLoginToken } from "../two-factor/twoFactor.service";
+import { logActivity } from "../../utils/logActivity";
 
 export const loginUser = async (email: string, password: string) => {
   const user = await db.query.users.findFirst({
@@ -13,6 +15,35 @@ export const loginUser = async (email: string, password: string) => {
 
   const isMatch = await bcrypt.compare(password, user.passwordHash);
   if (!isMatch) throw new Error("Invalid credentials");
+
+  if (user.twoFactorEnabled) {
+    if (!user.twoFactorSecret) {
+      throw new Error("Two-factor authentication is not configured");
+    }
+    const twoFactorToken = createTwoFactorLoginToken({
+      id: user.id,
+      role: user.role,
+      state: user.state,
+    });
+
+    await logActivity({
+      userId: user.id,
+      action: "2FA_LOGIN_CHALLENGE",
+    });
+
+    return {
+      status: "2FA_REQUIRED",
+      twoFactorToken,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        state: user.state,
+        twoFactorEnabled: user.twoFactorEnabled,
+      },
+    };
+  }
 
   const token = jwt.sign(
     {
@@ -32,6 +63,7 @@ export const loginUser = async (email: string, password: string) => {
       email: user.email,
       role: user.role,
       state: user.state,
+      twoFactorEnabled: user.twoFactorEnabled,
     },
   };
 };
@@ -99,6 +131,19 @@ export const createUser = async (currentUser: any, data: any) => {
 };
 
 /* =========================
+   GET ASSIGNED STATES
+========================= */
+
+export const getUserAssignedStates = async (userId: number) => {
+  const states = await db
+    .select({ state: enforcementHeadStates.state })
+    .from(enforcementHeadStates)
+    .where(eq(enforcementHeadStates.enforcementHeadId, userId));
+
+  return states.map((s) => s.state);
+};
+
+/* =========================
    GET USERS
 ========================= */
 
@@ -107,17 +152,112 @@ export const getAllUsers = async (currentUser: any) => {
     currentUser.role === "super_admin" ||
     currentUser.role === "enforcement_head"
   ) {
-    return await db.select().from(users);
+    const allUsers = await db
+      .select({
+        id: users.id,
+        fullName: users.fullName,
+        email: users.email,
+        role: users.role,
+        state: users.state,
+        isActive: users.isActive,
+        twoFactorEnabled: users.twoFactorEnabled,
+        createdAt: users.createdAt,
+      })
+      .from(users);
+
+    // Enrich enforcement heads with their assigned states
+    const enrichedUsers = await Promise.all(
+      allUsers.map(async (user) => {
+        if (user.role === "enforcement_head") {
+          const assignedStates = await getUserAssignedStates(user.id);
+          return { ...user, assignedStates };
+        }
+        return { ...user, assignedStates: user.state ? [user.state] : [] };
+      }),
+    );
+
+    return enrichedUsers;
   }
 
   if (currentUser.role === "state_controller") {
-    return await db
-      .select()
+    const allUsers = await db
+      .select({
+        id: users.id,
+        fullName: users.fullName,
+        email: users.email,
+        role: users.role,
+        state: users.state,
+        isActive: users.isActive,
+        twoFactorEnabled: users.twoFactorEnabled,
+        createdAt: users.createdAt,
+      })
       .from(users)
       .where(eq(users.state, currentUser.state));
+
+    const enrichedUsers = await Promise.all(
+      allUsers.map(async (user) => {
+        if (user.role === "enforcement_head") {
+          const assignedStates = await getUserAssignedStates(user.id);
+          return { ...user, assignedStates };
+        }
+        return { ...user, assignedStates: user.state ? [user.state] : [] };
+      }),
+    );
+
+    return enrichedUsers;
   }
 
   throw new Error("Unauthorized");
+};
+
+/* =========================
+   GET USER BY ID
+========================= */
+
+export const getUserById = async (currentUser: any, userId: number) => {
+  if (
+    !["super_admin", "enforcement_head", "state_controller"].includes(
+      currentUser.role,
+    )
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // State controllers can only view users in their state
+  if (
+    currentUser.role === "state_controller" &&
+    user.state !== currentUser.state
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  let assignedStates: string[] = [];
+
+  if (user.role === "enforcement_head") {
+    assignedStates = await getUserAssignedStates(user.id);
+  } else if (user.state) {
+    assignedStates = [user.state];
+  }
+
+  return {
+    id: user.id,
+    fullName: user.fullName,
+    email: user.email,
+    role: user.role,
+    state: user.state,
+    isActive: user.isActive,
+    twoFactorEnabled: user.twoFactorEnabled,
+    createdAt: user.createdAt,
+    assignedStates,
+  };
 };
 
 /* =========================

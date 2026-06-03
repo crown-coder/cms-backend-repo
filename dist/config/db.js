@@ -41,6 +41,6 @@ const neon_http_1 = require("drizzle-orm/neon-http");
 const serverless_1 = require("@neondatabase/serverless");
 const schema = __importStar(require("../db/schema"));
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
+dotenv_1.default.config({ override: true });
 const sql = (0, serverless_1.neon)(process.env.DATABASE_URL);
 exports.db = (0, neon_http_1.drizzle)(sql, { schema });

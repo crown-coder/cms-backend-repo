@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePassword = exports.removeUser = exports.createSuperAdmin = exports.fetchUsers = exports.registerUser = exports.login = void 0;
+exports.updatePassword = exports.removeUser = exports.createSuperAdmin = exports.fetchUserById = exports.fetchUsers = exports.registerUser = exports.login = void 0;
 const auth_service_1 = require("./auth.service");
 const login = async (req, res) => {
     try {
@@ -33,6 +33,16 @@ const fetchUsers = async (req, res) => {
     }
 };
 exports.fetchUsers = fetchUsers;
+const fetchUserById = async (req, res) => {
+    try {
+        const user = await (0, auth_service_1.getUserById)(req.user, Number(req.params.id));
+        res.json(user);
+    }
+    catch (error) {
+        res.status(403).json({ message: error.message });
+    }
+};
+exports.fetchUserById = fetchUserById;
 const createSuperAdmin = async (req, res) => {
     try {
         const result = await (0, auth_service_1.bootstrapSuperAdmin)(req.body);
